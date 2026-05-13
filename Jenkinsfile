@@ -32,12 +32,12 @@ pipeline {
         }
 
         stage('Run New App') {
-            steps {
-                sh '''
-                nohup java -jar target/*.jar > app.log 2>&1 &
-                '''
-            }
-        }
+    steps {
+        sh '''
+        nohup java -jar target/user-service-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        '''
+    }
+}
 
         stage('Health Check') {
             steps {
