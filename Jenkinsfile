@@ -1,31 +1,46 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK21'
-        maven 'Maven'
-    }
-
     stages {
 
         stage('Build') {
             steps {
-                echo 'Building application...'
                 sh 'mvn clean install'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
                 sh 'mvn test'
             }
         }
 
-        stage('Package Info') {
+        stage('Stop Old App') {
             steps {
-                echo 'Checking generated JAR...'
-                sh 'ls -la target'
+                sh '''
+                PID=$(lsof -ti:8081 || true)
+
+                if [ ! -z "$PID" ]; then
+                  kill -9 $PID
+                fi
+                '''
+            }
+        }
+
+        stage('Run New App') {
+            steps {
+                sh '''
+                nohup java -jar target/*.jar > app.log 2>&1 &
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                sleep 15
+                curl http://localhost:8081
+                '''
             }
         }
     }
