@@ -31,12 +31,15 @@ pipeline {
             }
         }
 
-        stage('Run New App') {
+       stage('Run New App') {
     steps {
         sh '''
+        export BUILD_ID=dontKillMe
         nohup java -jar target/user-service-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        sleep 5
         '''
     }
+}
 }
 
         stage('Health Check') {
