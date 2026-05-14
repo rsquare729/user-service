@@ -1,12 +1,13 @@
 pipeline {
     agent any
-    
-    environment {
-        PATH = "/usr/local/bin:${env.PATH}"
-    }
 
     tools {
         maven 'Maven-3'
+    }
+
+    environment {
+        PATH = "/usr/local/bin:${env.PATH}"
+        IMAGE_NAME = "rrdocker729/user-service:v1"
     }
 
     stages {
@@ -19,31 +20,38 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t user-service:v1 .'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-        stage('Stop Old Container') {
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'rrdocker729',
+                    passwordVariable: 'R@jranjan1'
+                )]) {
+
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $IMAGE_NAME'
+            }
+        }
+
+        stage('Deploy Container') {
             steps {
                 sh '''
                 docker rm -f user-service-container || true
-                '''
-            }
-        }
 
-        stage('Run New Container') {
-            steps {
-                sh '''
                 docker run -d -p 8081:8081 \
                 --name user-service-container \
-                user-service:v1
+                $IMAGE_NAME
                 '''
-            }
-        }
-
-        stage('Verify Container') {
-            steps {
-                sh 'docker ps'
             }
         }
     }
