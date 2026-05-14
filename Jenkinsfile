@@ -7,46 +7,39 @@ pipeline {
 
     stages {
 
-        stage('Build') {
+        stage('Build JAR') {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                sh 'mvn test'
+                sh 'docker build -t user-service:v1 .'
             }
         }
 
-        stage('Stop Old App') {
+        stage('Stop Old Container') {
             steps {
                 sh '''
-                PID=$(lsof -ti:8081 || true)
-
-                if [ ! -z "$PID" ]; then
-                  kill -9 $PID
-                fi
+                docker rm -f user-service-container || true
                 '''
             }
         }
 
-       stage('Run New App') {
-    steps {
-        sh '''
-        export BUILD_ID=dontKillMe
-        nohup java -jar target/user-service-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-        sleep 5
-        '''
-    }
-}
-
-        stage('Health Check') {
+        stage('Run New Container') {
             steps {
                 sh '''
-                sleep 15
-                curl http://localhost:8081
+                docker run -d -p 8081:8081 \
+                --name user-service-container \
+                user-service:v1
                 '''
+            }
+        }
+
+        stage('Verify Container') {
+            steps {
+                sh 'docker ps'
             }
         }
     }
