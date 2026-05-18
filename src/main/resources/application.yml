@@ -5,17 +5,17 @@ spring:
   application:
     name: USER-SERVICE
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
+    url: jdbc:mysql://database-user-service.cleqaiyiopvh.ap-south-1.rds.amazonaws.com:3306/usersdb
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: admin
+    password: jabtakhaijan
 
   h2:
     console:
       enabled: true
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
