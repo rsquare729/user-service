@@ -11,18 +11,14 @@ spring:
     username: admin
     password: jabtakhaijan
 
-  h2:
-    console:
-      enabled: true
-
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
 
 eureka:
   instance:
+    hostname: 52.66.188.57
     prefer-ip-address: true
     ip-address: 52.66.188.57
 
