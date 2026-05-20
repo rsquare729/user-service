@@ -4,6 +4,7 @@ server:
 spring:
   application:
     name: USER-SERVICE
+
   datasource:
     url: jdbc:mysql://database-user-service.cleqaiyiopvh.ap-south-1.rds.amazonaws.com:3306/usersdb
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,7 +20,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
 eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 52.66.188.57
+
   client:
     service-url:
       defaultZone: http://52.66.188.57:8761/eureka
